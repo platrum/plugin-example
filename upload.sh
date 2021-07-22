@@ -4,11 +4,21 @@ if [[ $PLATRUM_HOST == "" ]]; then
   PLATRUM_HOST=https://app.platrum.ru
 fi
 
+if [[ $PLATRUM_API_KEY == "" ]]; then
+  printf "PLATRUM_API_KEY bash variable should be specified\n"
+  exit 1
+fi
+
+if [[ $PLATRUM_API_PROJECT == "" ]]; then
+  printf "PLATRUM_API_PROJECT bash variable should be specified\n"
+  exit 1
+fi
+
 PLATRUM_AUTH="key=${PLATRUM_API_KEY}&project=${PLATRUM_API_PROJECT}"
 
 if [[ $1 == "" ]]; then
-  echo "\n  Usage: ./upload.sh {plugin_name}\n"
-  exit
+  printf "Usage: ./upload.sh {plugin_name}\n"
+  exit 1
 fi
 
 realpath() {

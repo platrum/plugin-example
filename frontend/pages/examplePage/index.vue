@@ -21,9 +21,11 @@
       v-loading="isLoading"
       :columns="columns"
       :rows="entities"
-      show-actions
+      clickable
       empty-text="Пусто!"
-      @show-row-info="openSidebar"
+      selectable
+      show-actions
+      @row-click="openSidebar"
     >
       <div class="actions" slot="actions" slot-scope="{ row }">
         <ui-button
@@ -36,7 +38,12 @@
       </div>
     </ui-collection-panel-table>
 
-    <sidebar ref="sidebar" @submit="storeItem" />
+    <sidebar
+      ref="sidebar"
+      v-model="selectedItem"
+      @input="storeItem"
+      @hide="handleSidebarHide"
+    />
   </company-layout>
 </template>
 
@@ -60,6 +67,7 @@ export default {
       isLoading: true,
       filter: {},
       entities: [],
+      selectedItem: this.createDefaultItem(),
       filterSettings: [
         {
           type: 'in',
@@ -72,9 +80,19 @@ export default {
           },
         },
         {
+          type: '~=',
+          label: 'Текстовое поле',
+          name: 'text',
+        },
+        {
+          type: '~=',
+          label: 'Строковое поле',
+          name: 'string_field',
+        },
+        {
           type: 'dateRange',
-          label: 'Дата создания',
-          name: 'creation_date',
+          label: 'Дата',
+          name: 'date',
           format: 'date',
         },
       ],
@@ -96,25 +114,69 @@ export default {
           sortable: true,
         },
         {
+          id: 'text',
+          name: 'Текст',
+          format: 'text',
+          is_hidden_by_default: true,
+        },
+        {
           component: 'ui-readable-date-time',
-          name: 'Дата создания',
-          id: 'creation_date',
+          name: 'Дата',
+          id: 'date',
           sortable: true,
           sortType: 'date',
-          getComponentAttrs(row) {
-            return { date: row.creation_date, capitalizeFirstLetter: true };
-          },
+          getComponentAttrs: row => ({ date: row.date, capitalizeFirstLetter: true }),
+        },
+        {
+          id: 'string_field',
+          name: 'Строковое поле',
+          sortable: true,
+        },
+        {
+          id: 'bool_field',
+          name: 'Булево поле',
+          width: '100px',
+          format: 'bool',
+          align: 'right',
+          sortable: true,
+        },
+        {
+          id: 'int_field',
+          name: 'Числовое поле',
+          width: '100px',
+          format: 'number',
+          sortType: 'number',
+          align: 'center',
+          sortable: true,
         },
       ],
     };
   },
   computed: {
     hasCreationAccess() {
-      // @TODO implement
-      return true;
+      return this.$platform.access.hasAccess('plugin-example.user_creation');
     },
     currentUserId() {
       return this.$modules.user.profile.getCurrent().user_id;
+    },
+  },
+  watch: {
+    itemId: {
+      immediate: true,
+      async handler(val) {
+        if (!val) {
+          return;
+        }
+        const itemId = Number(val);
+        let entity = this.entities.find(entity => entity.id === itemId);
+        if (!entity) {
+          [entity] = await this.$modules.plugins.api.select(entityName, [
+            ['id', '=', itemId],
+          ]);
+        }
+        this.selectedItem = entity;
+        this.$refs.sidebar.open();
+      },
     },
   },
   methods: {
@@ -127,9 +189,29 @@ export default {
       this.$refs.sidebar.open();
     },
     async storeItem(item) {
-      // @TODO add access set
-      const storedItem = await this.$modules.plugins.api.storeOne(entityName, item);
-      this.entities.push(storedItem);
+      try {
+        const itemWithAccessRules = this.setItemAccessRules(item);
+        const storedItem = await this.$modules.plugins.api.storeOne(entityName, itemWithAccessRules);
+        this.entities.push(storedItem);
+      } catch (e) {
+        this.$uiNotify.error('Ошибка при сохранении');
+        throw e;
+      }
+    },
+    setItemAccessRules(item) {
+      return {
+        ...item,
+        access_rules: [
+          {
+            action: 'view',
+            allow_everyone: true,
+          },
+          {
+            action: 'edit',
+            user_id: this.currentUserId,
+          },
+        ],
+      };
     },
     async remove(row) {
       await this.$modules.plugins.api.delete(entityName, [
@@ -138,8 +220,22 @@ export default {
       $utils.array.removeFirst(this.entities, { id: row.id });
       this.$uiNotify.success('Сущность удалена');
     },
-    openSidebar() {
-      // @TODO implement
+    openSidebar(item) {
+      this.$platform.router.redirect('plugin-example.examplePage', { itemId: item.id });
+    },
+    handleSidebarHide() {
+      this.selectedItem = this.createDefaultItem();
+      this.$platform.router.redirect('plugin-example.examplePage');
+    },
+    createDefaultItem() {
+      return {
+        user_id: null,
+        text: null,
+        date: null,
+        string_field: null,
+        bool_field: null,
+        int_field: null,
+      };
     },
   },
 };

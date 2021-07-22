@@ -2,5 +2,13 @@ example_item:
   fields:
     user_id:
       type: string
-    creation_date:
+    text:
+      type: string
+    date:
       type: date
+    string_field:
+      type: string
+    bool_field:
+      type: bool
+    int_field:
+      type: int

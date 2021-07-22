@@ -11,24 +11,38 @@
         prop="user_id"
         :rules="[{ required: true, message: 'Выберите пользователя'}]"
       >
-        <orgschema-user-selector
-          v-model="item.user_id"
-          :font-size="14"
-        />
+        <orgschema-user-selector v-model="item.user_id" :font-size="14" />
+      </el-form-item>
+
+      <el-form-item label="Текстовое поле" prop="text">
+        <ui-text-editor v-model="item.text" class="text-editor" bordered />
       </el-form-item>
 
       <el-form-item
-        prop="creation_date"
-        label="Дата создания"
+        prop="date"
+        label="Дата"
         :rules="[{ required: true, message: 'Заполните дату'}]"
       >
-        <ui-element-date-picker
-          v-model="item.creation_date"
-          placeholder="Выберите дату создания"
+        <el-date-picker
+          v-model="item.date"
+          type="date"
+          placeholder="Заполните дату"
           size="small"
-          style="width: 100%"
         />
       </el-form-item>
+
+      <el-form-item label="Строковое поле" prop="string_field">
+        <el-input v-model="item.string_field" size="small" />
+      </el-form-item>
+
+      <el-form-item label="Булево поле" prop="bool_field">
+        <el-checkbox v-model="item.bool_field" />
+      </el-form-item>
+
+      <el-form-item label="Числовое поле" prop="int_field">
+        <el-input-number v-model="item.int_field" size="small" />
+      </el-form-item>
+
       <el-form-item>
         <el-button
           type="primary"
@@ -45,6 +59,9 @@
 <script>
 
 export default {
+  props: {
+    value: Object,
+  },
   data() {
     return {
       isSidebarVisible: false,
@@ -53,6 +70,14 @@ export default {
         user_id: null,
       },
     };
+  },
+  watch: {
+    value: {
+      immediate: true,
+      handler(val) {
+        this.item = $utils.object.clone(val);
+      },
+    },
   },
   methods: {
     open() {
@@ -65,15 +90,12 @@ export default {
         this.$uiNotify.error('Заполните необходимые поля');
         return;
       }
-      this.$emit('submit', this.item);
+      this.$emit('input', this.item);
       this.resetState();
     },
     resetState() {
-      this.item = {
-        creation_date: null,
-        user_id: null,
-      };
       this.isSidebarVisible = false;
+      this.$emit('hide');
     },
   },
 };
@@ -87,6 +109,10 @@ export default {
 
   .content {
     padding-right: 30px;
+
+    .text-editor {
+      line-height: 20px;
+    }
   }
 }
 </style>
