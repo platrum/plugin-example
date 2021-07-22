@@ -1,0 +1,6 @@
+module: plugin-example
+name: Пример плагина
+description: Описание плагина
+dependencies:
+  - ui
+  - company

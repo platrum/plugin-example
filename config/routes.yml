@@ -1,0 +1,4 @@
+frontend:
+  examplePage:
+    pattern: /example
+    title: Example page
