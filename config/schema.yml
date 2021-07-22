@@ -1,0 +1,6 @@
+example_item:
+  fields:
+    user_id:
+      type: string
+    creation_date:
+      type: date
