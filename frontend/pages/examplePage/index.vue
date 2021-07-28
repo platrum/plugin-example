@@ -90,7 +90,7 @@ export default {
           name: 'string_field',
         },
         {
-          type: 'dateRange',
+          type: 'date',
           label: 'Дата',
           name: 'date',
           format: 'date',
