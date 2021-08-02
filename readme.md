@@ -234,8 +234,9 @@ frontend:
 
 #### Результат
 
-![img.png](./doc_img/example.png)
-<img src="doc_img/example.png" width="200"/>
+<p align="center">
+  <img src="doc_img/example.png">
+</p>
 
 ## Добавление страницы
 
