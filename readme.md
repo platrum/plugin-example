@@ -232,7 +232,7 @@ frontend:
     title: Example page
 ```
 
-![img.png](./doc_img/img.png)
+![img.png](./doc_img/example.png)
 
 ## Добавление страницы
 
