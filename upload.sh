@@ -41,5 +41,5 @@ zip -r plugin.zip .
 
 curl "${PLATRUM_HOST}/plugins/api/plugin/upload?${PLATRUM_AUTH}" \
   -H 'Content-Type: application/json' \
-  -X 'GET' \
+  -X 'GET' >> /dev/null \
   --data-binary "@./plugin.zip"

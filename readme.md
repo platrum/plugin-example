@@ -55,8 +55,6 @@
 В этом файле определяются системное и человекочитамое имена плагина, краткое описание функциональности, а так же перечисляются зависимости от модулей `Platurm`:
 
 ```yml
-#config/main.yml
-
 module: plugin-example
 name: Пример плагина
 description: Описание плагина
@@ -77,12 +75,11 @@ dependencies:
 #### Маршруты
 
 В файле `config/routes.yml` определяются маршруты вашего frontend приложения.
+Маршрут - это то, что сопоставляет путь до страницы и frontend компонент страницы. 
 Без добавления маршрутов в этот файл страницы вашего приложения не будут доступны.
-Маршруты добавляются очень просто:
+Пример конфигурации frontend маршрутов:
 
 ```yml
-#config/routes.yml
-
 frontend:
   examplePage:
     pattern: /example
@@ -106,8 +103,6 @@ frontend:
 Ниже приведен пример добавления сущности `example_item` с набором полей `fields`:
 
 ```yml
-# config/schema.yml
-
 example_item:
   fields:
     user_id:
@@ -139,13 +134,11 @@ example_item:
 
 #### Доступы
 
-Платформа позволяет определять пользовательские доступы.
+Платформа позволяет проверять пользовательские доступы.
 Для работы с доступами вам потребуется описать их в файле `config/access.yml`:
 Пример добавления доступа:
 
 ```yml
-# config/access.yml
-
 user_creation:
   name: Создание пользователей
 user_deletion:
@@ -166,7 +159,6 @@ user_deletion:
 Пример:
 
 ```yml
-#config/translation.yml
 ru:
   module.name: Пример плагина
 en:
@@ -188,12 +180,29 @@ en:
 Для разработки frontend'а используется фреймворк `vue` версии `2.5.16`. 
 
 Так же вам доступна библиотека компонентов [element](https://element.eleme.io/2.9/#/en-US) версии `2.9`.
+Для использования библиотеки вам потребуется добавить модуль `ui-element` в `dependencies` в базовом файле конфигурации `config/main.yml`. 
 
 Далее рассмотрим базовые frontend файлы:
 
 #### app.js
 
-@TODO 
+@TODO
+
+```js
+export default {
+  slots: {
+    'company.header': [
+      {
+        name: 'Пример страницы',
+        route: 'plugin-example.examplePage',
+      },
+    ],
+  },
+  initHook($platform) {
+    console.log('init plugin');
+  },
+};
+```
 
 #### pages.js
 
@@ -211,8 +220,6 @@ export default {
 Для страницы `examplePage` правильное определение маршрута выглядит так:
 
 ```yml
-#config/routes.yml
-
 frontend:
   examplePage: # id маршрута
     pattern: /example 
@@ -246,8 +253,6 @@ frontend:
 При разработке плагина вы можете придерживаться любой удобной вам структуры файлов, единственное ограничение - все ваши компоненты должны находится в корневой папке плагина `frontend`.
 
 ```vue
-<!--frontend/pages/examplePage/index.vue-->
-
 <template>
   <company-layout>
     <div>Пустая страница</div>
@@ -261,8 +266,6 @@ frontend:
 #### Экспортируем страницу
 
 ```js
-// frontend/pages.js
-
 import examplePage from './pages/examplePage';
 
 export default {
@@ -273,8 +276,6 @@ export default {
 #### Добавляем маршрут страницы
 
 ```yaml
-# config/routes.yml
-
 frontend:
   examplePage:
     pattern: /example
@@ -283,7 +284,7 @@ frontend:
 
 #### Добавляем название плагина
 
-Для того чтобы во вкладке браузера отображалось название нашего модуля определим имя модуля `module.name` в `config/translactions.yml`:
+Для того чтобы во вкладке браузера отображалось название нашего модуля, определим имя модуля `module.name` в `config/translactions.yml`:
 
 ```yaml
 ru:
@@ -298,8 +299,6 @@ en:
 Чтобы добавить страницу в меню модуля, нам потребуется объявить свойство `slots` в экспортируемом по умолчанию объекте в `frontend/app.js`
 
 ```js
-// frontend/app.js
-
 export default {
   slots: {
     'company.header': [
@@ -336,8 +335,60 @@ export default {
 
 ### Добавляем верстку на страницу
 
-@TODO
+####
 
+Добавим базовую верстку на ранее созданную страницу `frontend/pages/examplePage/index.vue`:
+
+```vue
+<template>
+  <company-layout>
+    <div slot="toolbar">
+      <el-button
+        type="primary"
+        size="mini"
+        icon="el-icon-plus"
+      />
+    </div>
+
+    <ui-collection-panel-filter
+      slot="sidebar"
+      v-model="filter"
+      :settings="filterSettings"
+    />
+
+    <ui-collection-panel-table
+      v-loading="isLoading"
+      :columns="columns"
+      :rows="entities"
+      clickable
+      empty-text="Пусто!"
+      selectable
+      without-settings
+    />
+  </company-layout>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      isLoading: false,
+      filter: {},
+      filterSettings: [],
+      columns: [],
+      entities: [],
+    }
+  },
+};
+</script>
+```
+
+Здесь мы добавили `el-button` кнопку в слот `toolbar`, панель с фильтрами `ui-collection-panel-filter` в слот `sidebar` и таблицу `ui-collection-panel-table`
+
+
+<p align="center">
+  <img src="doc_img/basic_markup.png" width="600">
+</p>
 
 #### Работа с переводами
 
