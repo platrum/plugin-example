@@ -334,31 +334,16 @@ export default {
   <img src="doc_img/empty.png" width="600">
 </p>
 
-### Добавление маршрутов
+### Добавляем верстку на страницу
 
-Пример объявления роута `examplePage` с путем `/example` и заголовком `Example page`:
-
-```yml
-frontend:
-  examplePage:
-    pattern: /example
-    title: Example page
-```
-
-### Экспорт страницы
-
-Пример экспорта страницы `examplePage` в `frontend/pages.js`:
-
-```js
-import examplePage from './pages/examplePage';
-
-export default {
-  examplePage,
-};
-```
+@TODO
 
 
-### Сохранение
+#### Работа с переводами
+
+@TODO
+
+### Управляем данными
 
 Для сохранения одной или нескольких сущностей вы можете использовать методы `storeOne` или `storeMany` соответственно.
 
@@ -448,9 +433,11 @@ this.$modules.plugins.api.select('plugin-example.example_item', [
 ]);
 ```
 
-## Работа с правами пользователей
+### Контролируем доступы
 
-### Добавление доступа
+@TODO
+
+#### Добавление доступа
 
 Для создания доступа объявите доступ в файле конфигурации `config/access.yml`:
 
@@ -462,7 +449,7 @@ user_creation:
 После объявления доступа, он появится на странице доступов `/settings/page/common/access`.
 [Подробнее](https://help.platrum.ru/article/45-article) о доступах.
 
-### Проверка доступа
+#### Проверка доступа
 
 Пример функции проверки доступов:
 ```js
@@ -474,9 +461,9 @@ function hasCreationAccess() {
 }
 ```
 
-### Настройка доступов к сущностям
+#### Настройка доступов к сущностям
 
-#### Общая структура доступа
+##### Общая структура доступа
 
 ```js
 const permission = {
@@ -497,7 +484,7 @@ const permission = {
 * `allow_everyone` - доступ для всех пользователей 
 * `allow_managers` - доступ для руководителей
 
-#### Примеры
+##### Примеры
 
 * Доступ на чтение для пользователей с должностью c ID = `2`
 
@@ -545,7 +532,3 @@ const permission = {
   "allow_nested": true
 }
 ```
-
-## Работа с переводами
-
-@TODO
