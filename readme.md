@@ -1162,7 +1162,45 @@ methods: {
 
 #### Удаляем данные
 
+Добавим метод:
+
+```js
+async deleteItem(row) {
+  // вызываем апи метод удаления 
+  await this.$modules.plugins.api.delete('plugin-example.example_item', [
+    ['id', '=', row.id],
+  ]);
+  // после успешного вызовам апи, удаляем сущность из сотояния компонента 
+  this.entities = this.entities.filter(entity => entity.id !== row.id);
+  // показываем уведомление об успешном удалении
+  this.$uiNotify.success('Сущность удалена');
+},
+```
+
+Доработаем таблицу:
+
+```vue
+<ui-collection-panel-table
+  v-loading="isLoading"
+  :columns="columns"
+  :rows="entities"
+  clickable
+  empty-text="Пусто!"
+  selectable
+  without-settings
+  show-actions
+>
+  <div class="actions" slot="actions" slot-scope="{ row }">
+    <el-button type="danger" icon="el-icon-delete" size="mini" circle @click="deleteItem(row)" />
+  </div>
+</ui-collection-panel-table>
+```
+
 #### Результат
+
+<p align="center">
+  <img src="doc_img/final.png" width="600">
+</p>
 
 ### Работа с переводами
 
