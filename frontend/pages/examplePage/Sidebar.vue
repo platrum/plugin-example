@@ -65,10 +65,7 @@ export default {
   data() {
     return {
       isSidebarVisible: false,
-      item: {
-        creation_date: null,
-        user_id: null,
-      },
+      item: {},
     };
   },
   watch: {
