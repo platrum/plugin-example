@@ -177,7 +177,7 @@ en:
 
 ### Frontend
 
-Для разработки frontend'а используется фреймворк `vue` версии `2.5.16`.
+Для разработки frontend'а используется фреймворк `vue` версии `2.5`.
 
 Так же вам доступна библиотека компонентов [element](https://element.eleme.io/2.9/#/en-US) версии `2.9`.
 Для использования библиотеки вам потребуется добавить модуль `ui-element` в `dependencies` в базовом файле конфигурации `config/main.yml`. 
@@ -233,7 +233,7 @@ frontend:
 
 * [Добавим пустую страницу в меню `компании`](#Добавление-пустой-страницы-в-меню-модуля)
 * [Оживим страницу, добавив в неё верстку](#Добавляем-верстку-на-страницу)
-* [Сконфигурируем фильтры и колонки таблицы](#Добавляем-верстку-на-страницу)
+* [Сконфигурируем фильтры и колонки таблицы](#Конфигурация-страницы)
 * [Узнаем, как манипулировать данными](#Управляем-данными)
 * [Научимся управлять доступами](#Контролируем-доступы)
 
@@ -345,9 +345,9 @@ export default {
 На этой странице мы уже добавили компонент-разметку `company-layout`.
 Этот компонент предоставляет следующие [слоты](https://ru.vuejs.org/v2/guide/components-slots.html) для разметки:
 
-* слот `toolbar` позволяет добавлять разметку в меню модуля
-* слот `sidebar` позволяет добавлять разметку в левую часть страницы
-* слот по умолчанию, в котором размещается основной контент страницы, в нашем примере это будет таблица
+* Слот `toolbar` позволяет добавлять разметку в верхнее меню модуля, в него мы добавим кнопку для открытия сайдбара.
+* Слот `sidebar` позволяет добавлять разметку в левую часть страницы. В этом примере мы добавим в него панель с фильтрами.
+* Слот по умолчанию, в котором размещается основной контент страницы, в нашем примере это будет таблица и сайдбар с формой для заполнения данных.
 
 В разметке мы будем использовать компоненты предоставляемые библиотеками `ui-element` и `ui-collection`:
 
@@ -615,11 +615,74 @@ export default {
 
 ### Конфигурация страницы
 
+В добавленной ранее таблице сейчас не хватает колонок, а в левой панели - фильтров.
+В этом шаге мы рассмотрим, как сконфигурировать таблицу и панель с фильтрами. 
+
 #### Добавление колонок в таблицу
 
+Используемый нами компонент таблицы `ui-collection-panel-table`, позволяет гибко настраивать свои колонки.
+Добавим описание колонок в `columns` свойство компонента `frontend/pages/examplePage/index.vue`:
+
+```js
+  columns: [
+    {
+      name: '#',
+      id: 'id',
+      width: '50px',
+      format: 'id',
+      sortable: true,
+      clickable: true,
+      sortType: 'number',
+    },
+    {
+      id: 'user_id',
+      width: '250px',
+      name: 'Пользователь',
+      format: 'user',
+      sortable: true,
+    },
+    {
+      id: 'text',
+      name: 'Текст',
+      format: 'text',
+    },
+    {
+      component: 'ui-readable-date-time',
+      name: 'Дата',
+      id: 'date',
+      sortable: true,
+      sortType: 'date',
+      getComponentAttrs: row => ({ date: row.date, capitalizeFirstLetter: true }),
+    },
+    {
+      id: 'string_field',
+      name: 'Строковое поле',
+      sortable: true,
+    },
+    {
+      id: 'bool_field',
+      name: 'Булево поле',
+      width: '100px',
+      format: 'bool',
+      align: 'right',
+      sortable: true,
+    },
+    {
+      id: 'int_field',
+      name: 'Числовое поле',
+      width: '100px',
+      format: 'number',
+      sortType: 'number',
+      align: 'center',
+      sortable: true,
+    },
+  ]
+```
 
 #### Добавление фильтров в таблицу
 
+Компонент панели фильтров позволяет гибко настраивать своё содержимое.
+Добавим фильтры в свойство `filterSettings` компонента страницы: 
 
 ```js
   filterSettings: [
@@ -639,7 +702,7 @@ export default {
       name: 'text',
     },
     {
-      type: '~=',
+      type: '=',
       label: 'Строковое поле',
       name: 'string_field',
     },
@@ -647,12 +710,124 @@ export default {
       type: 'date',
       label: 'Дата',
       name: 'date',
-      format: 'date',
     },
   ]
 ```
 
+Здесь мы добавили:
+
+* фильтр по пользователям
+* фильтр по текстовым полям `text` и `string_field`
+* фильтр по дате `date`
+
+
+Рассмотрим структуру фильтра:
+
+* `type` - тип фильтра, возможные значения: `=`, `in`, `~=`, `date`
+* `label` - человекочитаемое название фильтра
+* `name` - имя фильтруемого поля
+* `component` - имя или объект компонента
+* `props` - входные параметры для компонента
+
 #### Результат
+
+В этом шаге мы дорабатывали `data` свойства компонента `frontend/pages/examplePage/index.vue`.
+Полученный итоговый код:
+
+```js
+  data() {
+    return {
+      isLoading: false,
+      filter: {},
+      filterSettings: [
+        {
+          type: 'in',
+          component: 'orgschema-user-selector',
+          label: 'Пользователь',
+          name: 'user_id',
+          props: {
+            multiple: true,
+            'show-deleted': true,
+          },
+        },
+        {
+          type: '~=',
+          label: 'Текстовое поле',
+          name: 'text',
+        },
+        {
+          type: '~=',
+          label: 'Строковое поле',
+          name: 'string_field',
+        },
+        {
+          type: 'date',
+          label: 'Дата',
+          name: 'date',
+          format: 'date',
+        },
+      ],
+      columns: [
+        {
+          name: '#',
+          id: 'id',
+          width: '50px',
+          format: 'id',
+          sortable: true,
+          clickable: true,
+          sortType: 'number',
+        },
+        {
+          id: 'user_id',
+          width: '250px',
+          name: 'Пользователь',
+          format: 'user',
+          sortable: true,
+        },
+        {
+          id: 'text',
+          name: 'Текст',
+          format: 'text',
+          is_hidden_by_default: true,
+        },
+        {
+          component: 'ui-readable-date-time',
+          name: 'Дата',
+          id: 'date',
+          sortable: true,
+          sortType: 'date',
+          getComponentAttrs: row => ({ date: row.date, capitalizeFirstLetter: true }),
+        },
+        {
+          id: 'string_field',
+          name: 'Строковое поле',
+          sortable: true,
+        },
+        {
+          id: 'bool_field',
+          name: 'Булево поле',
+          width: '100px',
+          format: 'bool',
+          align: 'right',
+          sortable: true,
+        },
+        {
+          id: 'int_field',
+          name: 'Числовое поле',
+          width: '100px',
+          format: 'number',
+          sortType: 'number',
+          align: 'center',
+          sortable: true,
+        },
+      ],
+      entities: [],
+      selectedItem: this.createDefaultItem(),
+    };
+  }
+```
+
+Посмотрим на итоговый результат:
 
 <p align="center">
   <img src="doc_img/basic_markup.png" width="600">
