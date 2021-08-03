@@ -331,7 +331,7 @@ export default {
 После загрузки плагина, нам станет доступна страница по пути `/plugin-example/example`:
 
 <p align="center">
-  <img src="doc_img/empty.png">
+  <img src="doc_img/empty.png" width="600">
 </p>
 
 ### Добавление маршрутов
