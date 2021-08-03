@@ -117,8 +117,6 @@ example_item:
       type: bool
     int_field:
       type: int
-    int_array:
-      type: array[int]
     map_field:
       type: map
 ```
@@ -128,7 +126,7 @@ example_item:
 * `int` - целочисленное значение
 * `string` - строковое значение
 * `bool` - булево значение
-* `array` - массив значений, может быть типизированным, например `array[int]`
+* `array` - массив значений
 * `map` - коллекция ключ/значение
 * `date` - дата в `ISO` формате
 
@@ -1068,29 +1066,63 @@ this.$modules.plugins.api.select('plugin-example.example_item', [
 
 #### Добавляем данные на страницу приложения
 
-Добавим функции сохранения
+В этом шаге мы начнем работать с данными. Для этого нам потребуется:
 
-```vue
+* [создать схему данных](#Создаем-схему-приложения)
+* [начать сохранять данные](#Сохраняем-данные)
+* [загружать сохраненные данные](#Загружаем-данные)
+* [удалять данные](#Удаляем-данные)
+
+#### Создаем схему приложения
+
+Создадим сущность `example_item` в файле `config/schema.yml` с полями:
+
+```yml
+example_item:
+  fields:
+    user_id:
+      type: string
+    text:
+      type: string
+    date:
+      type: date
+    string_field:
+      type: string
+    bool_field:
+      type: bool
+    int_field:
+      type: int
+```
+
+#### Сохраняем данные
+
+На этом шаге мы начнем сохранять данные.
+Перед вызовом метода сохранения, мы обязаны установить доступы сущности в свойстве `access_rules`.
+Заметьте, что мы не определяли свойство `access_rules` в схеме выше.
+Это свойство доступно по умолчанию во всех создаваемых вами сущностях.
+
+Добавим метод `setItemAccessRules`, в котором мы установим доступ на просмотр для всех пользователей и доступ на редактирование для создавшего запись пользователя.
+Для получения `user_id` текущего пользователя, воспользуемся `$modules.user.profile.getCurrent().user_id`.
+Для сохранения сущности, добавим метод `storeItem`:
+
+```js
 methods: {
   setItemAccessRules(item) {
     return {
       ...item,
       access_rules: [
-        {
-          action: 'view',
-          allow_everyone: true,
-        },
-        {
-          action: 'edit',
-          user_id: this.$modules.user.profile.getCurrent().user_id,
-        },
+        { action: 'view', allow_everyone: true },
+        { action: 'edit', user_id: this.$modules.user.profile.getCurrent().user_id },
       ],
     };
   },
   async storeItem(item) {
     try {
+      // устанавливаем доступы, используя метод setItemAccessRules
       const itemWithAccessRules = this.setItemAccessRules(item);
+      // вызываем апи метод сохранения
       const storedItem = await this.$modules.plugins.api.storeOne('plugin-example.example_item', itemWithAccessRules);
+      // добавляем сохранные данные в состояние компонента
       this.entities.push(storedItem);
     } catch (e) {
       this.$uiNotify.error('Ошибка при сохранении');
@@ -1099,6 +1131,38 @@ methods: {
   },
 }
 ```
+
+#### Загружаем данные
+
+Для загрузки данных, определим метод `loadItems` в компоненте `frontend/pages/examplePage/index.vue`:
+
+```js
+methods: {
+  async loadItems({ dbFormatFilter = [] }) {
+    // добавляем loader на время загрузки данных
+    this.isLoading = true;
+    // вызываем апи метод загрузки данных
+    this.entities = await this.$modules.plugins.api.select(entityName, dbFormatFilter);
+    // по окончанию загрузки убираем loader
+    this.isLoading = false;
+  },
+}
+```
+
+Так же добавим загрузку данных по нажатию на кнопку фильтровать в панели фильтров:
+
+```vue
+<ui-collection-panel-filter
+  slot="sidebar"
+  v-model="filter"
+  :settings="filterSettings"
+  @submit="loadItems"
+/>
+```
+
+#### Удаляем данные
+
+#### Результат
 
 ### Работа с переводами
 
