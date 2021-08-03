@@ -184,10 +184,14 @@ en:
 
 #### app.js
 
-@TODO
+В этом файле вы можете определить функцию `initHook`, которая будет вызываться при каждой загрузке страницы проекта.
+Так же этот файл позволяет вам расширять функциональность модулей `Platrum`, добавляя свои страницы:
 
 ```js
 export default {
+  initHook($platform) {
+    console.log('init plugin');
+  },
   slots: {
     'company.header': [
       {
@@ -195,9 +199,6 @@ export default {
         route: 'plugin-example.examplePage',
       },
     ],
-  },
-  initHook($platform) {
-    console.log('init plugin');
   },
 };
 ```
@@ -1413,4 +1414,4 @@ export default {
 
 ## Итоговый результат
 
-@TODO
+
