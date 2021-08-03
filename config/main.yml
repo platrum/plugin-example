@@ -5,3 +5,5 @@ dependencies:
   - ui
   - ui-collection
   - ui-element
+  - company
+  - orgschema
