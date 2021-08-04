@@ -3,4 +3,7 @@ name: Пример плагина
 description: Описание плагина
 dependencies:
   - ui
+  - ui-collection
+  - ui-element
   - company
+  - orgschema

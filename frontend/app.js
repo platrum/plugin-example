@@ -2,7 +2,7 @@ export default {
   slots: {
     'company.header': [
       {
-        name: 'Example page',
+        name: 'Пример страницы',
         route: 'plugin-example.examplePage',
       },
     ],

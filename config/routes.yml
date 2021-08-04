@@ -1,4 +1,4 @@
 frontend:
   examplePage:
     pattern: /example
-    title: Example page
+    title: Пример страницы
