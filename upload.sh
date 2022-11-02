@@ -46,6 +46,6 @@ printf "\n\n"
 
 curl "${PLATRUM_HOST}/plugins/api/plugin/upload?${PLATRUM_AUTH}" \
   -H 'Content-Type: application/json' \
-  --data-binary "@./plugin.zip"
+  --data-binary "@./${PLUGIN_NAME}.zip"
   
 printf "\n\n"
