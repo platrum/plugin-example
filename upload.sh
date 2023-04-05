@@ -30,8 +30,8 @@ dir=$(realpath)
 printf "\n\n"
 
 docker run -it --rm \
-  -v ${dir}/frontend:/app/src \
-  -v ${dir}/assets/bundle:/assets \
+  -v "${dir}/frontend:/app/src" \
+  -v "${dir}/assets/bundle:/assets" \
   -e NODE_ENV=production \
   -e HASH_NAMES=0 \
   -e PLUGIN_NAME="${PLUGIN_NAME}" \
@@ -40,7 +40,7 @@ docker run -it --rm \
 
 printf "\n\n"
 
-zip -r "${PLUGIN_NAME}".zip . -x "**/node_modules/*"
+zip -r "${PLUGIN_NAME}".zip assets config frontend
 
 printf "\n\n"
 
