@@ -1,3 +1,5 @@
+import _ from 'underscore';
+
 export default {
   slots: {
     'page.layout.navbar.company': [
@@ -19,5 +21,8 @@ export default {
         order: 100,
       }],
     },
+  },
+  initHook() {
+    console.log('grouped routes', _.groupBy(__CONTEXT__.routes, r => r.module));
   },
 };
