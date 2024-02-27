@@ -1,3 +1,6 @@
 .idea
 /assets/
 plugin.zip
+yarn-error*
+node_modules
+*.zip

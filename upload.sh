@@ -29,6 +29,10 @@ PLUGIN_NAME=plugin-${1}
 dir=$(realpath)
 printf "\n\n"
 
+set -e
+
+"${dir}/yarn.sh" install
+
 docker run -it --rm \
   -v "${dir}/frontend:/app/src" \
   -v "${dir}/assets/bundle:/assets" \
